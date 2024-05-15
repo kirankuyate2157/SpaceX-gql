@@ -3,6 +3,8 @@ import { useQuery, gql } from "@apollo/client";
 import Hero from "@/components/Hero";
 import Photos from "@/components/Photos";
 import Rocket from "@/components/Rocket";
+import { ImSpinner3 } from "react-icons/im";
+import { MdOutlineReportGmailerrorred } from "react-icons/md";
 
 const LAUNCH_DETAILS = gql`
   query Launch($launchId: ID!) {
@@ -65,11 +67,24 @@ export default function LaunchDetails() {
   });
   // Check if the id is available
   if (!id) {
-    return <div>Loading...</div>;
+    return <div className="flex flex-col w-full min-h-64 h-full justify-center items-center ">
+    <MdOutlineReportGmailerrorred className=" text-3xl  text-white"/>
+    <p className="animate-pulse">{"Launch not found :( "}</p>
+</div>
   }
-  if (launchLoading) return <div>Loading...</div>;
-  if (launchError) return <div>Error: {launchError.message}</div>;
-
+  if(launchLoading){ 
+    return (<div className="flex flex-col w-full min-h-64 h-full justify-center items-center ">
+              <ImSpinner3 className=" text-2xl animate-spin text-white"/>
+              <p className="animate-pulse">Loading<span >...</span></p>
+            </div>
+    )};
+  
+    if (launchError) {
+    return <div className="flex flex-col w-full min-h-64 h-full justify-center items-center ">
+              <MdOutlineReportGmailerrorred className=" text-3xl  text-white"/>
+              <p className="animate-pulse">{"Somathing went wrong while fetching data :( "}</p>
+          </div>}
+  
   console.log("Launch data:", launchData);
 
   return (

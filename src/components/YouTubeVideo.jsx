@@ -9,7 +9,7 @@ function extractVideoId(url) {
     const embedUrl = `https://www.youtube.com/embed/${extractVideoId(videoId)}`;
   
     return (
-      <div>
+      <div className={`rounded bg-gray-800 ${!embedUrl?"animate-pulse":""}`}>
         <iframe
           className=' w-full'
           // width="150"

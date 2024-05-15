@@ -1,28 +1,34 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import { HiLocationMarker } from "react-icons/hi";
-import { IoMdArrowDropdown } from "react-icons/io";
 import { RiSearch2Line } from "react-icons/ri";
 const inter = Inter({ subsets: ["latin"] });
 import { useQuery, gql } from "@apollo/client";
 import Dropdown from "../components/Dropdown";
-import { useRouter } from "next/router";
+import { ImSpinner3 } from "react-icons/im";
+import { MdOutlineReportGmailerrorred } from "react-icons/md";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import YouTubeVideo from "@/components/YouTubeVideo";
+import Pagination from "@/components/Pagination";
+import Card from "@/components/Card";
 
 
-function formatDate(timestamp) {
-  const date = new Date(timestamp);
-  const day = date.getDate();
-  const month = date.toLocaleString("default", { month: "long" });
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
-}
 
 const GET_LAUNCHES = gql`
-  query LaunchesQuery($limit: Int) {
-    launches(limit: $limit) {
+  query LaunchesQuery(
+    $find: LaunchFind
+    $limit: Int
+    $offset: Int
+    $order: String
+    $sort: String
+  ) {
+    launches(
+      find: $find
+      limit: $limit
+      offset: $offset
+      order: $order
+      sort: $sort
+    ) {
       mission_name
       launch_date_local
       launch_success
@@ -54,7 +60,6 @@ const GET_LAUNCHES = gql`
   }
 `;
 
-
 const COMPANY_DETAILS = gql`
   query CompanyDetails {
     company {
@@ -66,20 +71,22 @@ const COMPANY_DETAILS = gql`
     }
   }
 `;
-
+;
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("Asc");
-  const [filterOption, setFilterOption] = useState(null);
+  const [filterOption, setFilterOption] = useState("mission_name");
   const [selectedOption, setSelectedOption] = useState(null);
-  const launchesPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const launchesPerPage = 16;
 
   const { loading, error, data } = useQuery(COMPANY_DETAILS);
-  const router = useRouter();
-  const variable = {
+
+  const variables = {
     limit: launchesPerPage,
+    offset: (currentPage - 1) * launchesPerPage,
     find: searchTerm.trim() !== "" ? { [filterOption]: searchTerm } : null,
-    sort: filterOption ? filterOption : null,
+    sort: searchTerm.trim() !== "" && filterOption ? filterOption : null,
     order: sortOrder ? sortOrder.toLocaleLowerCase() : null,
   };
 
@@ -87,10 +94,16 @@ export default function Home() {
     loading: launchesLoading,
     error: launchesError,
     data: launchesData,
-  } = useQuery(GET_LAUNCHES, {
-    variable: { limit: launchesPerPage },
-  });
+  } = useQuery(GET_LAUNCHES, { variables });
 
+  console.log(" data ",launchesData)
+  const totalPages = Math.ceil(
+    (launchesData?.launches_aggregate?.aggregate?.count || 110) /
+      launchesPerPage
+  );
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
   const {
     name = "",
     founder = "",
@@ -99,24 +112,28 @@ export default function Home() {
     summary = "",
   } = data?.company || {};
 
-  const handleClick = (id) => {
-    const state = {
-      exampleData: "Some data to be passed to the next page",
-    };
-
-    router.push(`/launch/${id}`, undefined, { shallow: true, state });
-  };
+  
   const [filterOptions, setFilterOptions] = useState([]);
 
   useEffect(() => {
     if (launchesData && launchesData?.launches?.length > 0) {
-      const fields = Object.keys(launchesData?.launches[0]); 
+      const fields = Object.keys(launchesData?.launches[0]);
       setFilterOptions(fields);
     }
   }, [launchesData]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+if(loading){ 
+  return (<div className="flex flex-col w-full min-h-64 h-full justify-center items-center ">
+            <ImSpinner3 className=" text-2xl animate-spin text-white"/>
+            <p className="animate-pulse">Loading<span >...</span></p>
+          </div>
+  )};
+
+  if (error) {
+  return <div className="flex flex-col w-full min-h-64 h-full justify-center items-center ">
+            <MdOutlineReportGmailerrorred className=" text-3xl  text-white"/>
+            <p className="animate-pulse">{"Somathing went wrong while fetching data :( "}</p>
+        </div>}
 
   return (
     <div className='container '>
@@ -131,7 +148,7 @@ export default function Home() {
         />
         <div className='w-full sm:w-[50%] relative flex  justify-center h-full '>
           <h1 className='absolute top-[20%] font-bold '>
-            ADVANCING HUMAN SPACEFLIGHT <span className='animate-pulse'>_</span>
+            ADVANCING HUMAN SPACEFLIGHT <span className='animate-pulse text-orange-700'>__</span>
           </h1>
           <img
             src='https://sxcontent9668.azureedge.us/cms-assets/assets/Eva_Suit_Mobile_16512413e5.jpg'
@@ -158,7 +175,9 @@ export default function Home() {
       </div>
       <div className=' w-[100vw] px-4 md:px-20 justify-between  overflow-hidden relative flex flex-col  '>
         <div className='flex flex-col sm:flex-row sm:justify-between  sm:items-center'>
-          <h1 className='text-xl font-semibold my-4 px-2'>Lunches</h1>
+          <h1 className='text-3xl  text-orange-700 md:text-5xl font-semibold my-4 sm:my-6'>
+            Lunches
+          </h1>
           <div className='flex items-center space-x-4 mt-2 mb-4'>
             <div className=' w-full bg-white shadow-md p-1 px-2 flex items-center gap-3  border border-gray-200 rounded-lg'>
               <div className='flex w-full text-black items-center gap-2'>
@@ -185,6 +204,13 @@ export default function Home() {
             />
           </div>
         </div>
+        {launchesLoading?(<div className="flex flex-col w-full min-h-64 h-full justify-center items-center ">
+            <ImSpinner3 className=" text-2xl animate-spin text-white"/>
+            <p className="animate-pulse">Loading<span >...</span></p>
+          </div>):launchesError?(<div className="flex flex-col w-full min-h-64 h-full justify-center items-center ">
+            <MdOutlineReportGmailerrorred className=" text-3xl  text-white"/>
+            <p className="animate-pulse">{"Result not found or somthing went wrong !"}</p>
+        </div>):(
         <div className='w-full flex flex-wrap '>
           {launchesData?.launches
             ?.filter((ele) => {
@@ -197,18 +223,18 @@ export default function Home() {
                         .toLowerCase()
                         .includes(searchTerm.toLowerCase())
                     ) {
-                      return true; 
+                      return true;
                     }
                   }
-                  return false; 
+                  return false;
                 } else {
                   return ele[filterOption]
                     .toLowerCase()
                     .includes(searchTerm.toLowerCase());
                 }
               } else {
-                return true; 
-                      }
+                return true;
+              }
             })
             ?.sort((a, b) => {
               if (sortOrder === "Asc") {
@@ -222,60 +248,17 @@ export default function Home() {
               }
             })
             ?.map((item, index) => (
-              <div
-                key={index}
-                className='p-2 overflow-hidden relative rounded-md flex m-1 w-[100%] sm:w-[47%] lg:w-[33%] xl:w-[24.2%] min-h-[180px]  border-gray-200 border'
-              >
-                <div
-                  className='absolute  w-[100%] h-[100%]'
-                  style={{
-                    background:
-                      "linear-gradient(to top, #010204, #00030d, #000313, #000318, #00021c, #01031f, #020523, #030626, #040a29, #040e2d, #041130, #031434)",
-                    filter: "blur(900px)",
-                  }}
-                />
-                <div className='z-10 w-[50%] flex flex-col gap-2 justify-between'>
-                  <p className='text-sm'>
-                    {formatDate(item?.launch_date_local)}
-                  </p>
-                  <div>
-                    <p>
-                      <span className='text-xs'>Mission</span>{" "}
-                      {item?.mission_name}{" "}
-                    </p>
-                    <p>
-                      <span className='text-xs'>Rocket</span>{" "}
-                      {item?.rocket?.rocket_name}
-                    </p>
-                  </div>{" "}
-                  <button
-                    onClick={() => handleClick(item?.id)}
-                    className=' p-1 px-2 w-[70%]  border rounded-lg text-xs'
-                  >
-                    View Details
-                  </button>{" "}
-                </div>
-                <div className='w-full h-full gap-2  sm:w-[50%] flex flex-col justify-around items-center'>
-                  <div className='w-full z-10 h-full flex flex-col justify-around'>
-                    {item?.links?.flickr_images[0] ? (
-                      <div className='w-full  h-32 flex justify-center'>
-                        <img
-                          src={item?.links?.flickr_images[0]}
-                          alt={item?.rocket?.rocket_name}
-                          className='h-full rounded '
-                        />
-                      </div>
-                    ) : (
-                      <div>
-                        <YouTubeVideo  videoId={item?.links?.video_link} />
-                      </div>
-                    )}{" "}
-                  </div>
-                </div>{" "}
-              </div>
+          <Card key={index} item={item}/>
             ))}
-        </div>
-      </div>
+     </div>)}
+    </div>
+ {!launchesError&&( <Pagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      handlePageChange={handlePageChange}
+    />)}
+
+      
     </div>
   );
 }

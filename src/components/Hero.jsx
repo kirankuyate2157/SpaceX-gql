@@ -1,11 +1,10 @@
 import React from "react";
 import Info from "./Info";
+
 function extractVideoId(url) {
-    // Match the video ID from the YouTube URL
     const match = url.match(
       /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/
     );
-  
     // If match is found, return the video ID, otherwise return null
     return match ? match[1] : null;
   }
@@ -30,6 +29,7 @@ function YouTubeVideo({ videoId }) {
       </div>
     );
   }
+  
 const Hero = ({data}) => {
 
   return (
@@ -51,7 +51,7 @@ const Hero = ({data}) => {
         />
             <Info data={data}/>
           </div>
-          <div className="w-full min-h-64 bg-opacity-50 absolute z-10 bottom-0" />
+          <div className={`w-full bg-gray-700 ${data.links?.flickr_images[2]?" animate-pulse":""} min-h-64 bg-opacity-50 absolute z-10 bottom-0`} />
          
 {/* <YouTubeVideo videoId={data?.links?.video_link}/> */}
 <img
@@ -70,11 +70,13 @@ const Hero = ({data}) => {
           <div className="absolute z-20 bottom-4 px-10 ">
             <Info data={data}/>
           </div>
-          <img
-             src={data.links?.flickr_images[2]}
-            alt="poster"
-            className="w-full h-full"
-          />
+          {!data.links?.flickr_images[2]?(
+            <YouTubeVideo videoId={data?.links?.video_link}/>):(
+              <img
+                src={data.links?.flickr_images[2]}
+                alt=""
+                className="w-full h-full rounded-xl"
+              />)}
         </div>
 
         {/* Large */}
@@ -92,12 +94,13 @@ const Hero = ({data}) => {
 
           <div className="absolute z-30 left-24 top-10 flex items-center gap-10">
             <div className=" w-full h-96 ">
-            {/* <YouTubeVideo videoId={data?.links?.video_link}/> */}
+              {!data.links?.flickr_images[2]?(
+            <YouTubeVideo videoId={data?.links?.video_link}/>):(
               <img
                 src={data.links?.flickr_images[2]}
                 alt=""
                 className="w-full h-full rounded-xl"
-              />
+              />)}
             </div>
             <div  className="w-full h-full pr-20">
               <Info data={data}/>

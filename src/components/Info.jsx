@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import LinesEllipsis from "react-lines-ellipsis";
+
+
 function formatDate(timestamp) {
     const date = new Date(timestamp);
     const day = date.getDate();
@@ -14,19 +16,7 @@ function formatDate(timestamp) {
 const Info = ({data}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [price, setPrice] = useState(0);
-//   const { movie } = useContext(MovieContext);
 
-  //optinal chaning
-//   const genres = movie.genres?.map(({ name }) => name).join(",");
-
-  const rentMovies = () => {
-    setIsOpen(true);
-    setPrice(149);
-  };
-  const buyMovies = () => {
-    setIsOpen(true);
-    setPrice(599);
-  };
 
   return (
     <>
@@ -43,17 +33,17 @@ const Info = ({data}) => {
         </div>
         <div className="flex z-50 flex-col ">
         <h1 className="text-white  lg:text-5xl font-bold lg:block ">
-          {data.mission_name}
+          {data?.mission_name}
         </h1>
-        <p>{data.rocket.rocket.name} {`${data.rocket.rocket.type}`}</p>
+        <p>{data?.rocket?.rocket?.name} {`${data?.rocket?.rocket?.type}`}</p>
         </div>
         <div className="flex flex-col-reverse gap-3 lg:gap-5 lg:flex-col">
           <div className=" z-50  max-w-[1100px] text-white font-light flex flex-col gap-2 ">
-            <h4>From {data.rocket.rocket.country} at {formatDate(data.static_fire_date_utc)} </h4>
+            <h4>From {data?.rocket?.rocket?.country} at {formatDate(data?.static_fire_date_utc)} </h4>
             <h4>
             <LinesEllipsis
-            text={data.details}
-            maxLine={40}
+            text={data?.details||""}
+            maxLine={6}
             ellipsis='...'
             trimRight
             basedOn='words'
@@ -61,20 +51,7 @@ const Info = ({data}) => {
            
             </h4>
           </div>
-          {/* <div className="flex items-center gap-3 md:px-4 md:w-screen lg:w-full">
-            <button
-              onClick={rentMovies}
-              className="bg-red-600 w-full py-3 text-white font-semibold rounded-lg"
-            >
-              Rent ₹149
-            </button>
-            <button
-              onClick={buyMovies}
-              className="bg-red-600 w-full py-3 text-white font-semibold rounded-lg"
-            >
-              Buy ₹599
-            </button>
-          </div> */}
+      
         </div>
       </div>
     </>
