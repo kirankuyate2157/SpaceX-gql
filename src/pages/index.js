@@ -1,118 +1,245 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
-
+import { HiLocationMarker } from "react-icons/hi";
+import { IoMdArrowDropdown } from "react-icons/io";
+import { RiSearch2Line } from "react-icons/ri";
 const inter = Inter({ subsets: ["latin"] });
+import { useQuery, gql } from "@apollo/client";
+import Dropdown from "../components/Dropdown";
+import { useRouter } from "next/router";
+
+function formatDate(timestamp) {
+  const date = new Date(timestamp);
+  const day = date.getDate();
+  const month = date.toLocaleString("default", { month: "long" });
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+function extractVideoId(url) {
+  // Match the video ID from the YouTube URL
+  const match = url.match(
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/
+  );
+
+  // If match is found, return the video ID, otherwise return null
+  return match ? match[1] : null;
+}
+function YouTubeVideo({ videoId }) {
+  console.log("id : ", extractVideoId(videoId));
+  const embedUrl = `https://www.youtube.com/embed/${extractVideoId(videoId)}`;
+
+  return (
+    <div>
+      <iframe
+        className=' w-full'
+        // width="150"
+        maxWidth='180'
+        height='110'
+        src={embedUrl}
+        title='YouTube video player'
+        frameborder='0'
+        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+        allowfullscreen
+      ></iframe>
+    </div>
+  );
+}
+const GET_LAUNCHES = gql`
+  query LaunchesQuery($limit: Int) {
+    launches(limit: $limit) {
+      mission_name
+      launch_date_local
+      launch_success
+      upcoming
+      rocket {
+        rocket_type
+        rocket_name
+        rocket {
+          id
+          company
+          country
+          description
+          stages
+        }
+      }
+      launch_date_utc
+      launch_site {
+        site_name
+        site_id
+      }
+      id
+      details
+      mission_id
+      links {
+        flickr_images
+        video_link
+      }
+    }
+  }
+`;
+
+import Link from "next/link";
+import { useState } from "react";
+
+const COMPANY_DETAILS = gql`
+  query CompanyDetails {
+    company {
+      name
+      founder
+      founded
+      employees
+      summary
+    }
+  }
+`;
 
 export default function Home() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [filterOption, setFilterOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const { loading, error, data } = useQuery(COMPANY_DETAILS);
+  const router = useRouter();
+  const {
+    loading: launchesLoading,
+    error: launchesError,
+    data: launchesData,
+  } = useQuery(GET_LAUNCHES, { variables: { limit: 30 } });
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
+
+  const { name, founder, founded, employees, summary } = data.company;
+  console.log(launchesData);
+
+  
+
+  const handleClick = (id) => {
+    // Define the state object
+    const state = {
+      exampleData: 'Some data to be passed to the next page',
+    };
+
+    // Navigate to the LaunchDetails page with state
+    router.push(`/launch/${id}`, undefined, { shallow: true, state });
+  };
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className='container '>
+      <div className=' w-[100vw] px-4 md:px-20 justify-between  overflow-hidden relative flex sm:flex-row flex-col-reverse items-center '>
+        <div
+          className='absolute z-[1] w-[100%] h-[100%] -right-[40%] rounded-full opacity-40 bottom-40'
+          style={{
+            background:
+              "linear-gradient(to bottom, #0b0b0b, #0f0e14, #11111b, #111321, #101628, #111a30, #131f38, #132340, #192b4b, #1f3356, #263b61, #2c446d)",
+            filter: "blur(900px)",
+          }}
+        />
+        <div className='w-full sm:w-[50%] relative flex  justify-center h-full '>
+          <h1 className='absolute top-[20%] font-bold '>
+            ADVANCING HUMAN SPACEFLIGHT <span className='animate-pulse'>_</span>
+          </h1>
+          <img
+            src='https://sxcontent9668.azureedge.us/cms-assets/assets/Eva_Suit_Mobile_16512413e5.jpg'
+            alt='logo'
+            className=' w-auto h-[300px] sm:h-[500px] '
+          />
+        </div>
+        <div className='text-white flex w-full sm:w-[50%] p-4 max-w-[610px] pl-po justify-center '>
+          <div className='flex flex-col gap-2'>
+            <h1 className='text-4xl font-semibold'>{name}</h1>
+            <div className='flex gap-3 text-sm '>
+              <p>
+                <span className='font-semibold'>• Founder & CEO</span> {founder}
+              </p>
+              <p>
+                <span className='font-semibold'>• Founded</span>
+                {" 14 March "}
+                {founded}
+              </p>
+            </div>
+            <p className='text-sm'>{summary}</p>
+          </div>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className=' w-[100vw] px-4 md:px-20 justify-between  overflow-hidden relative flex flex-col  '>
+        <div className='flex flex-col sm:flex-row sm:justify-between  sm:items-center'>
+          <h1 className='text-xl font-semibold my-4 px-2'>Lunches</h1>
+          <div className='flex items-center space-x-4 mb-4'>
+            <div className=' w-full bg-white shadow-md p-1 px-2 flex items-center gap-3  border border-gray-200 rounded-lg'>
+              <div className='flex w-full text-black items-center gap-2'>
+                <RiSearch2Line classNam='text-lg' />
+                <input
+                  type='search'
+                  placeholder='Search..'
+                  className='w-full focus:outline-none'
+                />
+              </div>
+            </div>
+            <Dropdown
+              name='Filter'
+              options={["name", "mission", ""]}
+              selectedOption={filterOption}
+              setSelectedOption={setFilterOption}
+            />
+            <Dropdown
+              name='Sort'
+              options={["Asc", "Desc"]}
+              selectedOption={selectedOption}
+              setSelectedOption={setSelectedOption}
+            />
+          </div>{" "}
+        </div>
+        <div className='w-full flex flex-wrap '>
+          {launchesData?.launches?.map((item, index) => (
+            <div
+              key={index}
+              className='p-2 overflow-hidden relative rounded-md flex m-1 w-[100%] sm:w-[47%] lg:w-[33%] xl:w-[24.2%] min-h-[180px]  border-gray-200 border'
+            >
+              <div
+                className='absolute  w-[100%] h-[100%]'
+                style={{
+                  background:
+                    "linear-gradient(to top, #010204, #00030d, #000313, #000318, #00021c, #01031f, #020523, #030626, #040a29, #040e2d, #041130, #031434)",
+                  filter: "blur(900px)",
+                }}
+              />
+              <div className='z-10 w-[50%] flex flex-col gap-2 justify-between'>
+                <p className='text-sm'>{formatDate(item?.launch_date_local)}</p>
+                <div>
+                  <p>
+                    <span className='text-xs'>Mission</span>{" "}
+                    {item?.mission_name}{" "}
+                  </p>
+                  <p>
+                    <span className='text-xs'>Rocket</span>{" "}
+                    {item?.rocket?.rocket_name}
+                  </p>
+                </div>{" "}
+                <button  onClick={()=>handleClick(item?.id)} className=' p-1 px-2 w-[70%]  border rounded-lg text-xs'>
+                  View Details
+                </button>{" "}
+              </div>
+              <div className='w-full h-full gap-2  sm:w-[50%] flex flex-col justify-around items-center'>
+                <div className='w-full z-10 h-full flex flex-col justify-around'>
+                  {item?.links?.flickr_images[0] ? (
+                    <div className='w-full  h-32 flex justify-center'>
+                      <img
+                        src={item?.links?.flickr_images[0]}
+                        alt={item?.rocket?.rocket_name}
+                        className='h-full rounded '
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <YouTubeVideo videoId={item?.links?.video_link} />
+                    </div>
+                  )}{" "}
+                </div>
+              </div>{" "}
+            </div>
+          ))}
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
