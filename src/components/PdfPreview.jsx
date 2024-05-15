@@ -1,7 +1,6 @@
 import Modal from "react-modal";
 
 const PdfPreview = ({ setIsOpen, modalIsOpen, url }) => {
-  console.log("pdf url ",url)
   return (
     <Modal
       isOpen={modalIsOpen}

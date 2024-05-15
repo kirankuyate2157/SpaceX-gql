@@ -5,6 +5,7 @@ const Dropdown = ({ name, options,setSelectedOption,selectedOption }) => {
   // const [selectedOption, setSelectedOption] = useState(null);
 
   const handleOptionClick = (option) => {
+    console.log("pt s",option)
     setSelectedOption(option);
     setIsOpen(false);
   };
@@ -38,15 +39,15 @@ const Dropdown = ({ name, options,setSelectedOption,selectedOption }) => {
 
       {isOpen && (
         <div
-          className="absolute right-0 z-50 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="absolute right-0 z-50 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-auto max-h-[200px] "
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="menu-button"
           tabIndex="-1"
         >
-          {options.map((option) => (
+          {options?.map((option) => (
             <button
-              key={option.value}
+              key={option}
               onClick={() => handleOptionClick(option)}
               className={`${
                 selectedOption === option ? 'bg-gray-100 text-gray-900' : 'text-gray-700'

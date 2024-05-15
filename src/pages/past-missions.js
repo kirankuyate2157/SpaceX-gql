@@ -67,7 +67,6 @@ export default function PastMissions () { const [searchTerm, setSearchTerm] = us
                       {error.message}
                     </p>
 
-  // Implement sorting, filtering, and search logic here
 
   return (
     <div className='container mx-auto p-4'>
@@ -97,7 +96,7 @@ export default function PastMissions () { const [searchTerm, setSearchTerm] = us
           {sortOrder}
         </button>
       </div>
-      {/* Render launches here */}
+     
       <div>
         {data.launches.map((launch) => (
            <div key={launch.flight_number}>
@@ -113,7 +112,6 @@ export default function PastMissions () { const [searchTerm, setSearchTerm] = us
                Launch Success:
                {launch.launch_success ? 'Yes' : 'No'}
              </p>
-             {/* Render other launch details */}
            </div>
          ))}
       </div>
