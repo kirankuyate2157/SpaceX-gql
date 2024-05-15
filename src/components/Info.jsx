@@ -14,10 +14,6 @@ function formatDate(timestamp) {
     return `${day} ${month} ${year} ${formattedHours}:${minutes} ${meridiem} UTC`;
 }
 const Info = ({data}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [price, setPrice] = useState(0);
-
-
   return (
     <>
       <div className="flex   flex-col z-50 gap-3 lg:gap-8">

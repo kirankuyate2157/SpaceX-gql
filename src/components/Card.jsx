@@ -31,18 +31,19 @@ const Card = ({item}) => {
         filter: "blur(900px)",
       }}
     />
-    <div className='z-10 w-[50%] flex flex-col gap-2 justify-between'>
+    <div className='z-10 w-[68%] flex flex-col gap-2 justify-between'>
       <p className='text-sm'>
         {formatDate(item?.launch_date_local)}
       </p>
       <div>
-        <p>
+        <p className="flex flex-col">
           <span className='text-xs'>Mission</span>{" "}
           {item?.mission_name}{" "}
         </p>
         <p>
-          <span className='text-xs'>Rocket</span>{" "}
-          {item?.rocket?.rocket_name}
+         
+          {item?.rocket?.rocket_name} {" "}
+          <span className='text-xs'>Rocket</span>
         </p>
       </div>{" "}
       <button
@@ -56,7 +57,7 @@ const Card = ({item}) => {
       <div className='w-full z-10 h-full flex flex-col justify-around'>
         {item?.links?.flickr_images[0] ? (
           <div
-            className={`w-full rounded bg-gray-800 ${
+            className={` rounded ${
               !item?.links?.flickr_images[0] ? "animate-pulse" : ""
             } h-32 flex justify-center`}
           >

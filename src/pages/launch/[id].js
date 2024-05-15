@@ -85,15 +85,12 @@ export default function LaunchDetails() {
               <p className="animate-pulse">{"Somathing went wrong while fetching data :( "}</p>
           </div>}
   
-  console.log("Launch data:", launchData);
-
   return (
     <div className='w-full '>
       <Hero data={launchData?.launch} />
       {launchData?.launch?.links?.flickr_images?.length > 0 && (
         <Photos images={launchData?.launch?.links?.flickr_images} />
       )}
-      {/* <div>Launch details: {JSON.stringify(launchData?.launch)}</div> */}
       <Rocket data={launchData?.launch}/>
     </div>
   );

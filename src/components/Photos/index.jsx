@@ -131,11 +131,11 @@ const Photos = ({images}) => {
         },]
 
     return (
-        <div className=" px-6 md:px-20 mb-20 mx-auto overflow-hidden">
+        <div className=" flex flex-col px-6 md:px-20 mb-20 mx-auto overflow-hidden">
             <h1 className="text-3xl  text-orange-700 md:text-5xl font-semibold my-8 py-5">SpaceX Launch Captured Moments</h1>
 
             <Slider {...settings}>
-                {images.map((img,index) => (
+                {images?.map((img,index) => (
                     <PictureCarousalCard image={img} key={index} />
                 ))}
 

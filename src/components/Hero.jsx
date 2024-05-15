@@ -42,7 +42,7 @@ const Hero = ({data}) => {
         >
           <div className="absolute z-20 bottom-4 px-4 ">
           <div
-          className='absolute   z-[10] w-[100%] h-[100%]  '
+          className='absolute  bottom-[-10%] z-[10] w-[100%] h-[100%]  '
           style={{
             background:
               "linear-gradient(to bottom, #000000, #000000, #000000, #000000,  #000000, #000000)",
@@ -51,14 +51,15 @@ const Hero = ({data}) => {
         />
             <Info data={data}/>
           </div>
-          <div className={`w-full bg-gray-700 ${data.links?.flickr_images[2]?" animate-pulse":""} min-h-64 bg-opacity-50 absolute z-10 bottom-0`} />
+          <div className={`w-full min-h-64 bg-opacity-50 absolute z-10 bottom-0`} />
          
-{/* <YouTubeVideo videoId={data?.links?.video_link}/> */}
-<img
-              src={data.links?.flickr_images[2]}
-            alt="poster"
-            className="w-full h-full"
-          />
+          {!data.links?.flickr_images[2]?(
+            <YouTubeVideo videoId={data?.links?.video_link}/>):(
+              <img
+                src={data.links?.flickr_images[2]}
+                alt=""
+                className="w-full h-full "
+              />)}
         </div>
 
         {/* Medium */}
@@ -75,7 +76,7 @@ const Hero = ({data}) => {
               <img
                 src={data.links?.flickr_images[2]}
                 alt=""
-                className="w-full h-full rounded-xl"
+                className="w-full h-full"
               />)}
         </div>
 
