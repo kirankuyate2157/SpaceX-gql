@@ -26,11 +26,11 @@ const Rocket = ({data}) => {
       >
          {data?.rocket?.rocket?.description}
       </p>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 my-4">
       <a
         href={data?.links?.article_link}
         target="_black_"
-        className=' flex items-center gap-2 text-md hover:bg-orange-400 bg-transparent border border-gray-100 text-orange-600 hover:text-black hover:ease-in hover:duration-300 p-2 px-4 my-5 rounded-lg text-poppins text-normal'
+        className=' flex items-center gap-2 text-md hover:bg-orange-400 bg-transparent border border-gray-100 text-orange-600 hover:text-black hover:ease-in hover:duration-300 p-2 px-4  rounded-lg text-poppins text-normal'
         
       >
         Articles  <FaChevronCircleRight className='animate-pulse' />
@@ -38,14 +38,14 @@ const Rocket = ({data}) => {
       <a
            href={data?.links?.wikipedia}
            target="_black_"
-        className=' flex items-center gap-2 text-md hover:bg-orange-400 bg-transparent border border-gray-100 text-orange-600 hover:text-black hover:ease-in hover:duration-300 p-2 px-4 my-5 rounded-lg text-poppins text-normal'
+        className=' flex items-center gap-2 text-md hover:bg-orange-400 bg-transparent border border-gray-100 text-orange-600 hover:text-black hover:ease-in hover:duration-300 p-2 px-4  rounded-lg text-poppins text-normal'
         
       >
         Wiki  <FaChevronCircleRight className='animate-pulse' />
       </a>
       <button
       onClick={()=>setIsOpen(true)}
-        className=' flex items-center gap-2 text-md hover:bg-orange-400 bg-transparent border border-gray-100 text-orange-600 hover:text-black hover:ease-in hover:duration-300 p-2 px-4 my-5 rounded-lg text-poppins text-normal'
+        className=' flex items-center gap-2 text-md hover:bg-orange-400 bg-transparent border border-gray-100 text-orange-600 hover:text-black hover:ease-in hover:duration-300 p-2 px-4  rounded-lg text-poppins text-normal'
         
       >
         Presskit  <FaChevronCircleRight className='animate-pulse' />
